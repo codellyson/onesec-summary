@@ -5,9 +5,20 @@ import { AI } from "../lib/ai-service";
 function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [summary, setSummary] = useState("");
+  const [summaryType, setSummaryType] = useState<
+    "1 sentence" | "3 bullet points" | "ai decision"
+  >("1 sentence");
+  const [stream, setStream] = useState(false);
   const [error, setError] = useState("");
+  const [isCopied, setIsCopied] = useState(false);
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(summary);
+    setIsCopied(true);
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 2000);
+  };
 
-  const {} = AI.getInstance();
   const { summarize } = AI;
 
   const handleSummarize = async () => {
@@ -83,9 +94,15 @@ function App() {
 
       console.log("Extracted text length:", pageText.length);
 
-      // Use the AI service to generate summary
-      const result = await summarize(pageText);
-      console.log("result", result);
+      // Set streaming mode in AI service
+      AI.getInstance().setStream(stream);
+
+      // Use the AI service to generate summary with streaming support
+      const result = await summarize(pageText, summaryType, (chunk) => {
+        // Update summary in real-time during streaming
+        setSummary(chunk);
+      });
+      console.log("result", result, stream);
 
       if (!result) {
         throw new Error("Failed to generate summary");
@@ -120,10 +137,12 @@ function App() {
           </div>
         )}
 
-        {isLoading && (
+        {isLoading && !summary && (
           <div className="loading-section">
             <div className="spinner"></div>
-            <p className="loading-text">Analyzing page content...</p>
+            <p className="loading-text">
+              {stream ? "Streaming summary..." : "Analyzing page content..."}
+            </p>
           </div>
         )}
 
@@ -135,25 +154,85 @@ function App() {
 
         {summary && (
           <div className="summary-section">
-            <h3 className="summary-title">📝 Summary</h3>
-            <p className="summary-text">{summary}</p>
+            <h3 className="summary-title">
+              📝 Summary {isLoading && stream && "⏳"}
+            </h3>
+            <div
+              className="summary-text"
+              dangerouslySetInnerHTML={{ __html: summary }}
+            />
+            <div className="button-section">
+              <button
+                className="secondary-button"
+                onClick={handleCopyToClipboard}
+              >
+                {isCopied ? "Copied!" : "Copy to clipboard"}
+              </button>
+            </div>
           </div>
         )}
 
         <div className="button-section">
-          <button
-            className={`summarize-button ${isLoading ? "loading" : ""}`}
-            onClick={handleSummarize}
-            disabled={isLoading}
-          >
-            {isLoading ? "Summarizing..." : "📄 Summarize This Page"}
-          </button>
+          {/* Provide options: “1 sentence” or “3 bullet points” */}
+          {!summary && (
+            <>
+              <div className="summary-type-section">
+                <h4 className="summary-type-title">Summary Type:</h4>
+                <div className="summary-type-buttons">
+                  <button
+                    className={`summary-type-button ${
+                      summaryType === "1 sentence" ? "active" : ""
+                    }`}
+                    onClick={() => setSummaryType("1 sentence")}
+                  >
+                    1 Sentence
+                  </button>
+                  <button
+                    className={`summary-type-button ${
+                      summaryType === "3 bullet points" ? "active" : ""
+                    }`}
+                    onClick={() => setSummaryType("3 bullet points")}
+                  >
+                    3 Bullet Points
+                  </button>
+                  <button
+                    className={`summary-type-button ${
+                      summaryType === "ai decision" ? "active" : ""
+                    }`}
+                    onClick={() => setSummaryType("ai decision")}
+                  >
+                    AI Decide
+                  </button>
+                </div>
+              </div>
+
+              <div className="streaming-section">
+                <label className="streaming-toggle">
+                  <input
+                    type="checkbox"
+                    checked={stream}
+                    onChange={(e) => setStream(e.target.checked)}
+                  />
+                  <span className="toggle-slider"></span>
+                  <span className="toggle-label">Enable Streaming</span>
+                </label>
+              </div>
+
+              <button
+                className={`summarize-button ${isLoading ? "loading" : ""}`}
+                onClick={handleSummarize}
+                disabled={isLoading}
+              >
+                {isLoading ? "Summarizing..." : "📄 Summarize This Page"}
+              </button>
+            </>
+          )}
         </div>
 
         {summary && (
           <div className="action-section">
             <button
-              className="secondary-button"
+              className="summarize-button "
               onClick={() => {
                 setSummary("");
                 setError("");

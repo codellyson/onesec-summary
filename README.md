@@ -9,7 +9,7 @@ A Chrome Extension that gives you a 1-sentence summary of any web page using AI.
 - **AI-Powered**: Uses advanced AI models for accurate, concise summaries
 - **Beautiful UI**: Modern, responsive design with smooth animations
 - **Cross-Platform**: Works on any website
-- **Side Panel Support**: Open the extension in a side panel for persistent access
+- **Side Panel Interface**: Opens directly in a side panel for persistent access while browsing
 
 ## 🚀 Quick Start
 
@@ -34,9 +34,9 @@ A Chrome Extension that gives you a 1-sentence summary of any web page using AI.
 
 ### Using the Extension
 
-1. **Popup Mode**: Click the extension icon in the toolbar to open the popup
-2. **Side Panel Mode**: Click the "📱 Open in Side Panel" button in the popup to open the extension in a persistent side panel
-3. **Summarize**: Click "📄 Summarize This Page" to get an AI-generated summary of the current webpage
+1. **Open Side Panel**: Click the extension icon in the toolbar to open the side panel
+2. **Summarize**: Click "📄 Summarize This Page" to get an AI-generated summary of the current webpage
+3. **Persistent Access**: The side panel stays open while you browse, allowing you to summarize multiple pages
 
 ### Building for Production
 
@@ -75,11 +75,11 @@ HF_TOKEN=your_huggingface_token_here
 ```
 onesec-summary/
 ├── entrypoints/
-│   ├── popup/           # Extension popup UI
-│   │   ├── App.tsx      # Main React component
+│   ├── popup/           # Extension popup (auto-opens side panel)
+│   │   ├── App.tsx      # Popup React component
 │   │   ├── App.css      # Styles for the popup
 │   │   └── main.tsx     # Popup entry point
-│   ├── side-panel/      # Side panel UI
+│   ├── side-panel/      # Main side panel UI
 │   │   ├── App.tsx      # Side panel React component
 │   │   ├── App.css      # Styles for the side panel
 │   │   ├── main.tsx     # Side panel entry point
@@ -100,7 +100,7 @@ onesec-summary/
 - **Summary Section**: Displays the generated summary
 - **Error Section**: Shows error messages when something goes wrong
 - **Action Buttons**: Primary summarize button and secondary actions
-- **Side Panel Button**: Button to open the extension in a side panel for persistent access
+- **Side Panel Interface**: Optimized layout for the side panel with persistent access
 
 ## 🔒 Permissions
 
